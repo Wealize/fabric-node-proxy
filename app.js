@@ -21,15 +21,14 @@ app.use(function(req, res, next){
 });
 
 app.post('/api/v1/:chaincode_name/:method', function (req, res) {
-    //var fabric_service = new FabricService();
+    var fabric_service = new FabricService();
     var chaincode_name = req.params.chaincode_name;
     var method = req.params.method;
-    var instance = req.body;
-    console.log('instance: ')
-    console.log(instance)
-    //var data = JSON.stringify(req.body.data);
-    //var response = fabric_service.call(chaincode_name, method, data);
-    res.send({msj: 'ok'});
+    var instance = JSON.stringify(req.body);
+    var data = [];
+    data.push(instance);
+    var response = fabric_service.call(chaincode_name, method, data);
+    res.send({msj: response});
 });
 
 
