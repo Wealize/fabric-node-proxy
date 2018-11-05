@@ -17,7 +17,7 @@ export default class FabricService{
     }
 
     call(chaincode_name, method, data){
-        Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
+        return Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
         }).then((state_store) => {
            return this.prepareContext(state_store);
         }).then((user_from_store) => {
@@ -36,17 +36,15 @@ export default class FabricService{
                 }
         }).then((results) => {
             var response = results[0];
-            if (results && response && response.status === 'SUCCESS')
-                console.log('Successfully sent transaction to the orderer.');
-            else
+            if (results && response && response.status != 'SUCCESS')
                 throw new Error('Failed to order the transaction. Error code: ' + response.status);
 
             if(results && results[1] && results[1].event_status === 'VALID')
-                console.log('Successfully committed the change to the ledger by the peer');
+                return 'Successfully committed the change to the ledger by the peer';
             else
                 throw new Error('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
         }).catch((err) => {
-            console.error('Failed to invoke successfully :: ' + err);
+            return 'Failed to invoke successfully :: ' + err;
         });
     }
 

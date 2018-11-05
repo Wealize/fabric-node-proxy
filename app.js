@@ -28,9 +28,10 @@ app.post('/api/v1/:chaincode_name/:method', function (req, res) {
     var data = [];
     data.push(instance);
     var response = fabric_service.call(chaincode_name, method, data);
-    res.send({msj: response});
+    response.then((message) =>{
+        res.send(message);
+    });
 });
-
 
  app.listen( PORT , function(){
 	console.log('Server listening in port '+ PORT);
