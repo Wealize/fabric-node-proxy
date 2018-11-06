@@ -1,16 +1,26 @@
- stages:
-  - deploy
+stages:
+ - test
+ - deploy
 
- deploy:
-   stage: deploy
-   image: node:9
-   script:
-   - apt-get update -qy
-   - apt-get install -y ruby ruby-dev curl
-   - gem install dpl -v 1.8.47
-   - npm run start
-   - dpl --provider=heroku --app=fabric-node-proxy --api-key=$HEROKU_API_KEY
-   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy of proxy completed, last commit:\"}' $SLACK_WEBHOOK_URL"
-   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
-   only:
-   - tags
+test:
+  image: node:9
+  cache:
+    paths:
+    - ~/node_modules
+  script:
+  - npm install
+  - npm run test
+
+deploy:
+  stage: deploy
+  image: node:9
+  script:
+  - apt-get update -qy
+  - apt-get install -y ruby ruby-dev curl
+  - gem install dpl -v 1.8.47
+  - npm run start
+  - dpl --provider=heroku --app=fabric-node-proxy --api-key=$HEROKU_API_KEY
+  - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy of proxy completed, last commit:\"}' $SLACK_WEBHOOK_URL"
+  - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
+  only:
+  - master
