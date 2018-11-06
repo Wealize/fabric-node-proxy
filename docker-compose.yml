@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  proxy:
+    build: .
+    command: npm run start
+    volumes:
+    - ../fabric-node-proxy:/usr/src/app
+    ports:
+      - "3030:3030"
