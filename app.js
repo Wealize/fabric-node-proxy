@@ -30,6 +30,8 @@ app.post('/api/v1/:chaincode_name/:method', function (req, res) {
     var response = fabric_service.call(chaincode_name, method, data);
     response.then((message) =>{
         res.send(message);
+    }).catch((error) => {
+        res.status(401).send(error);
     });
 });
 
