@@ -3,3 +3,4 @@ cred.json
 node_modules/
 .DS_Store
 .vscode/
+config.json

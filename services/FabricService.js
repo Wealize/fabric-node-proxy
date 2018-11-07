@@ -12,6 +12,9 @@ export default class FabricService{
         this.order = this.fabric_client.newOrderer(creds.orderers.orderer.url, { pem: creds.orderers.orderer.tlsCACerts.pem , 'ssl-target-name-override': null})
         this.member_user = null;
         this.store_path = path.join(__dirname, '../hfc-key-store');
+        //  TODO Check if directory exists and it´s not empty
+        // Log if the folder doesn´t exist or the sync fails
+        // If empty or doesn´t exist then getCerts.js S3Service.syncDirectory()
         this.tx_id = null;
         this.setUpChannel();
     }
