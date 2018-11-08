@@ -1,6 +1,9 @@
 #!/bin/bash
 
-node getCerts.js
-node enrollAdmin.js
-node enrollUser.js
-node pushCerts.js
+node syncCerts.js
+
+if [ ! -d "hfc-key-store" ]; then
+    node enrollAdmin.js
+    node enrollUser.js
+    node syncCerts.js
+fi

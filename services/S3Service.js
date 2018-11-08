@@ -35,25 +35,27 @@ export default class S3Service {
 
     }
 
-    syncDirectory(){
+    syncDirectory() {
         var params = {
-            localDir: "hfc-key-store",
+            localDir: "../hfc-key-store",
             // deleteRemoved: true,
             s3Params: {
               Bucket: process.env.BUCKET_NAME || config.bucket
             }
           };
+
           var uploader = this.client.uploadDir(params);
+
           uploader.on('error', function(err) {
             console.error("unable to sync:", err.stack);
           });
+
           uploader.on('progress', function() {
             console.log("progress", uploader.progressAmount, uploader.progressTotal);
           });
+
           uploader.on('end', function() {
             console.log("done uploading");
           });
     }
-
-
 }
