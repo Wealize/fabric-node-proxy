@@ -2,19 +2,35 @@ var creds = require('../creds.json')
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
-var os = require('os');
+var fs = require('fs');
+var S3Service = require('./services/S3Service').default;
+var s3_service = new S3Service();
 
 export default class FabricService{
     constructor(){
         this.fabric_client = new Fabric_Client();
         this.channel = this.fabric_client.newChannel('defaultchannel');
-        this.peer = this.fabric_client.newPeer(creds.peers["org1-peer1"].url, { pem: creds.peers["org1-peer1"].tlsCACerts.pem , 'ssl-target-name-override': null});
-        this.order = this.fabric_client.newOrderer(creds.orderers.orderer.url, { pem: creds.orderers.orderer.tlsCACerts.pem , 'ssl-target-name-override': null})
+        this.peer = this.fabric_client.newPeer(
+            creds.peers["org1-peer1"].url,
+            {
+                pem: creds.peers["org1-peer1"].tlsCACerts.pem,
+                'ssl-target-name-override': null
+            }
+        );
+        this.order = this.fabric_client.newOrderer(
+            creds.orderers.orderer.url,
+            {
+                pem: creds.orderers.orderer.tlsCACerts.pem,
+                'ssl-target-name-override': null
+            }
+        );
         this.member_user = null;
         this.store_path = path.join(__dirname, '../hfc-key-store');
-        //  TODO Check if directory exists and it´s not empty
-        // Log if the folder doesn´t exist or the sync fails
-        // If empty or doesn´t exist then getCerts.js S3Service.syncDirectory()
+
+        if (fs.existsSync(this.store_path)) {
+            s3_service.syncDirectory();
+        }
+
         this.tx_id = null;
         this.setUpChannel();
     }
