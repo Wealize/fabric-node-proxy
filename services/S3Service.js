@@ -1,13 +1,14 @@
 var s3 = require('s3');
 const AWS = require('aws-sdk');
-var config = require('../config');
+
+
 export default class S3Service {
     constructor() {
         const awsS3Client = new AWS.S3({
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID || config.accessKeyId,
-            secretAccessKey: process.env.AWS_ACCESS_SECRET_ID || config.secretAccessKey,
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+            secretAccessKey: process.env.AWS_ACCESS_SECRET_ID || '',
             region: 'eu-central-1'
-          });
+        });
         this.client = s3.createClient({
             s3Client: awsS3Client
         });
@@ -17,7 +18,7 @@ export default class S3Service {
         var params = {
             localFile: "hfc-key-store/"+user,
             s3Params: {
-              Bucket: process.env.BUCKET_NAME || config.bucket,
+              Bucket: process.env.BUCKET_NAME || '',
               Key: user,
             },
           };
@@ -40,7 +41,7 @@ export default class S3Service {
             localDir: "../hfc-key-store",
             // deleteRemoved: true,
             s3Params: {
-              Bucket: process.env.BUCKET_NAME || config.bucket
+              Bucket: process.env.BUCKET_NAME || ''
             }
           };
 
