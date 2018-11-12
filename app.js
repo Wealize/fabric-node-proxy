@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var s3_service = new S3Service();
-s3_service.syncDirectory();
+s3_service.pullCreds();
 
 app.use(function(req, res, next){
     var token = req.get('token');

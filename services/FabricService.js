@@ -27,10 +27,6 @@ export default class FabricService{
         this.member_user = null;
         this.store_path = path.join(__dirname, '../hfc-key-store');
 
-        if (fs.existsSync(this.store_path)) {
-            s3_service.syncDirectory();
-        }
-
         this.tx_id = null;
         this.setUpChannel();
     }
