@@ -8,7 +8,7 @@ export default class S3Service {
         this.client = new AWS.S3();
     }
 
-    pushCredentials() {
+    pushCreds() {
       const localPath = __dirname + '/../hfc-key-store/';
       const s3Path = process.env.APP_ENVIRONMENT + '/';
       const bucket = process.env.BUCKET_NAME;

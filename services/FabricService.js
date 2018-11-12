@@ -2,9 +2,7 @@ var creds = require('../creds.json')
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
-var fs = require('fs');
-var S3Service = require('./S3Service').default;
-var s3_service = new S3Service();
+
 
 export default class FabricService{
     constructor(){
@@ -31,7 +29,7 @@ export default class FabricService{
         this.setUpChannel();
     }
 
-    call(chaincode_name, method, data){
+    call(chaincode_name, method, data) {
         return Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
         }).then((state_store) => {
            return this.prepareContext(state_store);
@@ -77,7 +75,7 @@ export default class FabricService{
         return this.fabric_client.getUserContext('Nieves', true);
     }
 
-    checkEnroll(user_from_store){
+    checkEnroll(user_from_store) {
         if (user_from_store && user_from_store.isEnrolled())
             this.member_user = user_from_store;
         else
