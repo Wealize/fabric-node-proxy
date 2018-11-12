@@ -1,19 +1,22 @@
 var express = require('express');
-var app = express();
 var bodyParser = require('body-parser');
-const PORT = process.env.PORT || 3030;
 var FabricService = require('./services/FabricService').default;
+var S3Service = require('./services/S3Service').default;
+require('dotenv').config();
 
-const TOKEN = 'xxxxx' || process.env.APP_TOKEN;
+var app = express();
+const PORT = process.env.PORT || 3030;
+const TOKEN = process.env.APP_TOKEN;
 
 app.use(bodyParser.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
+var s3_service = new S3Service();
+s3_service.syncDirectory();
+
 app.use(function(req, res, next){
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
     var token = req.get('token');
+
     if(token != TOKEN)
         res.status(401).send('Unauthorized');
     else

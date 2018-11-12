@@ -1,62 +1,63 @@
-var s3 = require('s3');
+const fs = require('fs');
+
 const AWS = require('aws-sdk');
 
 
 export default class S3Service {
     constructor() {
-        const awsS3Client = new AWS.S3({
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-            secretAccessKey: process.env.AWS_ACCESS_SECRET_ID || '',
-            region: 'eu-central-1'
-        });
-        this.client = s3.createClient({
-            s3Client: awsS3Client
-        });
+        this.client = new AWS.S3();
     }
 
-    download(user) {
-        var params = {
-            localFile: "hfc-key-store/"+user,
-            s3Params: {
-              Bucket: process.env.BUCKET_NAME || '',
-              Key: user,
-            },
-          };
-          var downloader = this.client.downloadFile(params);
+    pushCredentials() {
+      const localPath = __dirname + '/../hfc-key-store/';
+      const s3Path = process.env.APP_ENVIRONMENT + '/';
+      const bucket = process.env.BUCKET_NAME;
 
-          downloader.on('error', function(err) {
-            console.error("unable to download:", err.stack);
-          });
-          downloader.on('progress', function() {
-            console.log("progress", downloader.progressAmount, downloader.progressTotal);
-          });
-          downloader.on('end', function() {
-            console.log("done downloading");
-          });
+      var params = {};
+      var contents = '';
 
+      fs.readdirSync(localPath).forEach(file => {
+        contents = fs.readFileSync(localPath + file, 'utf8');
+        params = {Bucket: bucket, Key: s3Path + file, Body: contents};
+
+        this.client.putObject(params, (err, data) => {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log("Successfully uploaded data to myBucket/myKey");
+          }
+        });
+      });
     }
 
-    syncDirectory() {
-        var params = {
-            localDir: "../hfc-key-store",
-            // deleteRemoved: true,
-            s3Params: {
-              Bucket: process.env.BUCKET_NAME || ''
-            }
-          };
+    pullCreds() {
+      const localPath = __dirname + '/../hfc-key-store/';
+      const s3Path = process.env.APP_ENVIRONMENT + '/';
+      const bucket = process.env.BUCKET_NAME;
 
-          var uploader = this.client.uploadDir(params);
+      var params = {Bucket: bucket, Prefix: s3Path, Delimiter: '/'};
 
-          uploader.on('error', function(err) {
-            console.error("unable to sync:", err.stack);
-          });
+      this.client.listObjectsV2(params, (err, data) => {
+        if (err) {
+          console.log(err);
+        }
 
-          uploader.on('progress', function() {
-            console.log("progress", uploader.progressAmount, uploader.progressTotal);
-          });
+        data['Contents'].forEach(item => {
+          if (item['Key'] != s3Path) {
+            params = {Bucket: bucket, Key: item['Key']};
 
-          uploader.on('end', function() {
-            console.log("done uploading");
-          });
+            this.client.getObject(params, (err, data) => {
+              if (err) {
+                console.log(err);
+                return err;
+              }
+
+              let objectData = data.Body.toString('utf-8');
+              var filename = item['Key'].replace(s3Path, '');
+              fs.writeFileSync(localPath + filename, objectData);
+            });
+          }
+        });
+      });
     }
 }

@@ -3,7 +3,7 @@ var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 var fs = require('fs');
-var S3Service = require('./services/S3Service').default;
+var S3Service = require('./S3Service').default;
 var s3_service = new S3Service();
 
 export default class FabricService{

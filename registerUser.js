@@ -13,8 +13,6 @@ var Fabric_Client = require('fabric-client');
 var Fabric_CA_Client = require('fabric-ca-client');
 
 var path = require('path');
-var util = require('util');
-var os = require('os');
 
 //
 var fabric_client = new Fabric_Client();
@@ -22,7 +20,7 @@ var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
 var store_path = path.join(__dirname, 'hfc-key-store');
-console.log(' Store path:'+store_path);
+console.log(' Store path:' + store_path);
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 Fabric_Client.newDefaultKeyValueStore({ path: store_path
@@ -56,16 +54,16 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 
     // at this point we should have the admin user
     // first need to register the user with the CA server
-    return fabric_ca_client.register({enrollmentID: 'Nieves', affiliation: 'org1.department1',role: 'client'}, admin_user);
+    return fabric_ca_client.register({enrollmentID: process.env.FABRIC_USERNAME, affiliation: 'org1.department1',role: 'client'}, admin_user);
 }).then((secret) => {
     // next we need to enroll the user with CA server
-    console.log('Successfully registered user1 - secret:'+ secret);
+    console.log(`Successfully registered ${process.env.FABRIC_USERNAME} - secret:`+ secret);
 
-    return fabric_ca_client.enroll({enrollmentID: 'Nieves', enrollmentSecret: secret});
+    return fabric_ca_client.enroll({enrollmentID: process.env.FABRIC_USERNAME, enrollmentSecret: secret});
 }).then((enrollment) => {
-  console.log('Successfully enrolled member user "user1" ');
+  console.log(`Successfully enrolled member user "${process.env.FABRIC_USERNAME}" `);
   return fabric_client.createUser(
-     {username: 'Nieves',
+     {username: process.env.FABRIC_USERNAME,
      mspid: 'org1',
      cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
      });
@@ -74,7 +72,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 
      return fabric_client.setUserContext(member_user);
 }).then(()=>{
-     console.log('User1 was successfully registered and enrolled and is ready to interact with the fabric network');
+     console.log(`${process.env.FABRIC_USERNAME} was successfully registered and enrolled and is ready to interact with the fabric network`);
 
 }).catch((err) => {
     console.error('Failed to register: ' + err);
