@@ -30,6 +30,21 @@ export default class S3Service {
       });
     }
 
+    pullNetworkConfig() {
+      const bucket = process.env.BUCKET_NAME;
+      const params = {Bucket: bucket, Key: 'creds.json'};
+
+      this.client.getObject(params, (err, data) => {
+        if (err) {
+          console.log(err);
+          return err;
+        }
+
+        let objectData = data.Body.toString('utf-8');
+        fs.writeFileSync(__dirname + '/../creds.json', objectData);
+      });
+    }
+
     pullCreds() {
       const localPath = __dirname + '/../hfc-key-store/';
       const s3Path = process.env.APP_ENVIRONMENT + '/';

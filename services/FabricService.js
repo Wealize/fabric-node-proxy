@@ -3,15 +3,18 @@ var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 
+const DEFAULT_CHANNEL = 'defaultchannel';
+const DEFAULT_ORGANIZATION_PEER = 'org1-peer1'
+
 
 export default class FabricService{
-    constructor(){
+    constructor() {
         this.fabric_client = new Fabric_Client();
-        this.channel = this.fabric_client.newChannel('defaultchannel');
+        this.channel = this.fabric_client.newChannel(DEFAULT_CHANNEL);
         this.peer = this.fabric_client.newPeer(
-            creds.peers["org1-peer1"].url,
+            creds.peers[DEFAULT_ORGANIZATION_PEER].url,
             {
-                pem: creds.peers["org1-peer1"].tlsCACerts.pem,
+                pem: creds.peers[DEFAULT_ORGANIZATION_PEER].tlsCACerts.pem,
                 'ssl-target-name-override': null
             }
         );
