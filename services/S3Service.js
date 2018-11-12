@@ -50,6 +50,10 @@ export default class S3Service {
       const s3Path = process.env.APP_ENVIRONMENT + '/';
       const bucket = process.env.BUCKET_NAME;
 
+      if (!fs.existsSync(localPath)) {
+        fs.mkdirSync(localPath);
+      }
+
       var params = {Bucket: bucket, Prefix: s3Path, Delimiter: '/'};
 
       this.client.listObjectsV2(params, (err, data) => {

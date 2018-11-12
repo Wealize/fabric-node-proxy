@@ -64,12 +64,12 @@ export default class FabricService{
         });
     }
 
-    setUpChannel(){
+    setUpChannel() {
         this.channel.addOrderer(this.order);
         this.channel.addPeer(this.peer);
     }
 
-    prepareContext(state_store){
+    prepareContext(state_store) {
         this.fabric_client.setStateStore(state_store);
         var crypto_suite = Fabric_Client.newCryptoSuite();
         var crypto_store = Fabric_Client.newCryptoKeyStore({path: this.store_path});
@@ -85,15 +85,16 @@ export default class FabricService{
             throw new Error('Failed to get user1.... run registerUser.js');
     }
 
-    makeTransaction(chaincode_name){
+    makeTransaction(chaincode_name, method, data) {
         this.tx_id = this.fabric_client.newTransactionID();
         var request = {
             chaincodeId: chaincode_name,
-            fcn: 'createCar', // method
-            args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'], //data
-            chainId: 'defaultchannel',
+            fcn: method, // method
+            args: data, //data
+            chainId: DEFAULT_CHANNEL,
             txId: this.tx_id
         };
+
         return this.channel.sendTransactionProposal(request);
     }
 
