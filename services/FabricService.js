@@ -38,7 +38,7 @@ export default class FabricService{
            return this.prepareContext(state_store);
         }).then((user_from_store) => {
             this.checkEnroll(user_from_store);
-            return this.makeTransaction(chaincode_name);
+            return this.makeTransaction(chaincode_name, method, data);
         }).then((results) => {
             var proposalResponses = results[0];
             var proposal = results[1];
@@ -75,7 +75,7 @@ export default class FabricService{
         var crypto_store = Fabric_Client.newCryptoKeyStore({path: this.store_path});
         crypto_suite.setCryptoKeyStore(crypto_store);
         this.fabric_client.setCryptoSuite(crypto_suite);
-        return this.fabric_client.getUserContext('Nieves', true);
+        return this.fabric_client.getUserContext('javaguirre', true);
     }
 
     checkEnroll(user_from_store) {
