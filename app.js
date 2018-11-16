@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var FabricService = require('./services/FabricService').default;
 var S3Service = require('./services/S3Service').default;
 require('dotenv').config();
+var morgan = require('morgan');
 
 var app = express();
 const PORT = process.env.PORT || 3030;
@@ -10,6 +11,7 @@ const TOKEN = process.env.APP_TOKEN;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 
 var s3_service = new S3Service();
 s3_service.pullCreds();
