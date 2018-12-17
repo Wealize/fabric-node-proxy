@@ -32,13 +32,13 @@ export default class FabricService{
         this.setUpChannel();
     }
 
-    call(chaincode_name, method, data) {
+    call(chaincode_name, chaincode_method, data) {
         return Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
         }).then((state_store) => {
            return this.prepareContext(state_store);
         }).then((user_from_store) => {
             this.checkEnroll(user_from_store);
-            return this.makeTransaction(chaincode_name, method, data);
+            return this.makeTransaction(chaincode_name, chaincode_method, data);
         }).then((results) => {
             var proposalResponses = results[0];
             var proposal = results[1];
@@ -85,11 +85,11 @@ export default class FabricService{
             throw new Error('Failed to get user1.... run registerUser.js');
     }
 
-    makeTransaction(chaincode_name, method, data) {
+    makeTransaction(chaincode_name, chaincode_method, data) {
         this.tx_id = this.fabric_client.newTransactionID();
         var request = {
             chaincodeId: chaincode_name,
-            fcn: method, // method
+            fcn: chaincode_method,
             args: data, //data
             chainId: DEFAULT_CHANNEL,
             txId: this.tx_id

@@ -17,7 +17,7 @@ var s3_service = new S3Service();
 s3_service.pullCreds();
 
 
-app.post('/api/v1/:chaincode_name/:method', function (req, res) {
+app.post('/api/v1/:chaincode_name/:chaincode_method', function (req, res) {
 
     if (req.query.token != TOKEN) {
         res.status(401).send({'error': 'Forbidden'});
@@ -26,9 +26,9 @@ app.post('/api/v1/:chaincode_name/:method', function (req, res) {
 
     var fabric_service = new FabricService();
     var chaincode_name = req.params.chaincode_name;
-    var method = req.params.method;
-    var data = req.body;
-    var response = fabric_service.call(chaincode_name, method, data.args);
+    var chaincode_method = req.params.chaincode_method;
+    var response = fabric_service.call(
+        chaincode_name, chaincode_method, req.body);
 
     response.then((message) => {
         res.send({"ok": message});
