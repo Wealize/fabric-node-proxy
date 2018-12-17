@@ -15,11 +15,13 @@ var util = require('util');
 var os = require('os');
 console.log(creds.peers);
 
+const FABRIC_CHANNEL = process.env.FABRIC_CHANNEL;
+
 //
 var fabric_client = new Fabric_Client();
 
 // setup the fabric network
-var channel = fabric_client.newChannel('defaultchannel');
+var channel = fabric_client.newChannel(FABRIC_CHANNEL);
 var peer = fabric_client.newPeer(creds.peers["org1-peer1"].url, { pem: creds.peers["org1-peer1"].tlsCACerts.pem , 'ssl-target-name-override': null});
 channel.addPeer(peer);
 var order = fabric_client.newOrderer(creds.orderers.orderer.url, { pem: creds.orderers.orderer.tlsCACerts.pem , 'ssl-target-name-override': null})
@@ -65,7 +67,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		chaincodeId: 'fabcar',
 		fcn: 'initLedger',
 		args: [''],
-		chainId: 'defaultchannel',
+		chainId: FABRIC_CHANNEL,
 		txId: tx_id
 	};
 

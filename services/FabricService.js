@@ -3,7 +3,7 @@ var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 
-const DEFAULT_CHANNEL = 'defaultchannel';
+const DEFAULT_CHANNEL = process.env.FABRIC_CHANNEL;
 const DEFAULT_ORGANIZATION_PEER = 'org1-peer1'
 
 

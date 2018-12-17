@@ -14,11 +14,13 @@ var path = require('path');
 var util = require('util');
 var os = require('os');
 
+const FABRIC_CHANNEL = 'stagingchannel';
+
 //
 var fabric_client = new Fabric_Client();
 
 // setup the fabric network
-var channel = fabric_client.newChannel('defaultchannel');
+var channel = fabric_client.newChannel(FABRIC_CHANNEL);
 var peer = fabric_client.newPeer(creds.peers["org1-peer1"].url);
 channel.addPeer(peer);
 
