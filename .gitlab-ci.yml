@@ -9,7 +9,7 @@ test:
 
 staging:
   type: deploy
-  image: node:9
+  image: starefossen/ruby-node:2-10
   script:
   - apt-get update -qy
   - apt-get install -y ruby ruby-dev curl
@@ -22,7 +22,7 @@ staging:
 
 production:
   type: deploy
-  image: node:9
+  image: starefossen/ruby-node:2-10
   script:
   - apt-get update -qy
   - apt-get install -y ruby ruby-dev curl
