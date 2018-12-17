@@ -32,6 +32,16 @@ export default class FabricService{
         this.setUpChannel();
     }
 
+    serialize(data, instance_id) {
+        const payload_data = JSON.parse(data)
+
+        if (instance_id) {
+            return JSON.stringify([instance_id, payload_data]);
+        }
+
+        return JSON.stringify([payload_data]);
+    }
+
     call(chaincode_name, chaincode_method, data) {
         return Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
         }).then((state_store) => {

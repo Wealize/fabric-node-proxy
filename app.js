@@ -14,7 +14,33 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 
 var s3_service = new S3Service();
+var fabric_service = new FabricService();
 s3_service.pullCreds();
+
+
+app.post('/api/v1/:chaincode_name/:chaincode_method/:instance_id',
+    function (req, res) {
+
+    if (req.query.token != TOKEN) {
+        res.status(401).send({'error': 'Forbidden'});
+        return;
+    }
+
+    var payload = fabric_service.serialize(req.body, req.params.instance_id);
+    var response = fabric_service.call(
+        req.params.chaincode_name,
+        req.params.chaincode_method,
+        payload);
+
+    response.then((response) => {
+        // TODO if response is not valid do something
+        return response.json();
+    }).then((data) => {
+        res.send({status: 'ok', data: data})
+    }).catch((error) => {
+        res.status(400).send(error);
+    });
+});
 
 
 app.post('/api/v1/:chaincode_name/:chaincode_method', function (req, res) {
@@ -24,14 +50,17 @@ app.post('/api/v1/:chaincode_name/:chaincode_method', function (req, res) {
         return;
     }
 
-    var fabric_service = new FabricService();
-    var chaincode_name = req.params.chaincode_name;
-    var chaincode_method = req.params.chaincode_method;
+    var payload = fabric_service.serialize(req.body);
     var response = fabric_service.call(
-        chaincode_name, chaincode_method, req.body);
+        req.params.chaincode_name,
+        req.params.chaincode_method,
+        payload);
 
-    response.then((message) => {
-        res.send({"ok": message});
+    response.then((response) => {
+        // TODO if response is not valid do something
+        return response.json();
+    }).then((data) => {
+        res.send({status: 'ok', data: data})
     }).catch((error) => {
         res.status(400).send(error);
     });
