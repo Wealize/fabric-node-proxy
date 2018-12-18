@@ -33,8 +33,7 @@ app.post('/api/v1/:chaincode_name/:chaincode_method/:instance_id',
         payload);
 
     response.then((response) => {
-        // TODO if response is not valid do something
-        return response.json();
+        return response;
     }).then((data) => {
         res.send({status: 'ok', data: data})
     }).catch((error) => {

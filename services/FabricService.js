@@ -53,11 +53,12 @@ export default class FabricService{
             var proposal = results[1];
             var response = proposalResponses[0].response;
             var isValidStatus = proposalResponses && response && response.status === 200;
-            if (isValidStatus){
+
+            if (isValidStatus) {
                     console.log(util.format(
                         'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
                         response.status, response.message));
-                   return this.registerEvent(proposalResponses, proposal);
+                    return this.registerEvent(proposalResponses, proposal);
                 }
         }).then((results) => {
             var response = results[0];
@@ -66,7 +67,7 @@ export default class FabricService{
                 throw new Error('Failed to order the transaction. Error code: ' + response.status);
 
             if(results && results[1] && results[1].event_status === 'VALID')
-                return 'Successfully committed the change to the ledger by the peer';
+                return results;
             else
                 throw new Error('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
         }).catch((err) => {
