@@ -33,17 +33,16 @@ export default class FabricService{
     }
 
     serialize(data, instance_id) {
-        const payload_data = JSON.parse(data)
-
         if (instance_id) {
-            return JSON.stringify([instance_id, payload_data]);
+            return [String(instance_id), JSON.stringify(data)];
         }
 
-        return JSON.stringify([payload_data]);
+        return [JSON.stringify(data)];
     }
 
     call(chaincode_name, chaincode_method, data) {
         return Fabric_Client.newDefaultKeyValueStore({ path: this.store_path
+
         }).then((state_store) => {
            return this.prepareContext(state_store);
         }).then((user_from_store) => {
@@ -62,6 +61,7 @@ export default class FabricService{
                 }
         }).then((results) => {
             var response = results[0];
+
             if (results && response && response.status != 'SUCCESS')
                 throw new Error('Failed to order the transaction. Error code: ' + response.status);
 
@@ -96,11 +96,12 @@ export default class FabricService{
     }
 
     makeTransaction(chaincode_name, chaincode_method, data) {
+
         this.tx_id = this.fabric_client.newTransactionID();
         var request = {
             chaincodeId: chaincode_name,
             fcn: chaincode_method,
-            args: data, //data
+            args: data,
             chainId: DEFAULT_CHANNEL,
             txId: this.tx_id
         };
