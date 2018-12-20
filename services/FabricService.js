@@ -71,7 +71,7 @@ export default class FabricService{
             else
                 throw new Error('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
         }).catch((err) => {
-            return 'Failed to invoke successfully :: ' + err;
+            throw new Error('Failed to invoke successfully :: ' + err);
         });
     }
 
