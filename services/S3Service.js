@@ -1,3 +1,5 @@
+// DEPRECATED, not being used for now, but we might need it later
+
 const fs = require('fs');
 
 const AWS = require('aws-sdk');

@@ -1,2 +1,2 @@
 web: npm start
-release: sh buildCertsAndCreds.sh
+release: sh syncCerts.sh
