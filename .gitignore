@@ -1,7 +1,9 @@
 hfc-key-store/
-cred.json
+creds.json
 node_modules/
 .DS_Store
 .vscode/
 config.json
 certs.json
+.env
+package-lock.json
