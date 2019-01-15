@@ -4,10 +4,11 @@ var path = require('path');
 var util = require('util');
 
 const DEFAULT_CHANNEL = process.env.FABRIC_CHANNEL;
-const DEFAULT_ORGANIZATION_PEER = 'org1-peer1'
+const DEFAULT_ORGANIZATION_PEER = process.env.DEFAULT_ORGANIZATION || 'org1-peer1';
+const DEFAULT_USER = process.env.FABRIC_USER || 'user1';
 
 
-export default class FabricService{
+export default class FabricService {
     constructor() {
         this.fabric_client = new Fabric_Client();
         this.channel = this.fabric_client.newChannel(DEFAULT_CHANNEL);
@@ -86,7 +87,7 @@ export default class FabricService{
         var crypto_store = Fabric_Client.newCryptoKeyStore({path: this.store_path});
         crypto_suite.setCryptoKeyStore(crypto_store);
         this.fabric_client.setCryptoSuite(crypto_suite);
-        return this.fabric_client.getUserContext('javaguirre', true);
+        return this.fabric_client.getUserContext(DEFAULT_USER, true);
     }
 
     checkEnroll(user_from_store) {
