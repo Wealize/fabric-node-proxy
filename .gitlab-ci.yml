@@ -15,6 +15,7 @@ staging:
   - apt-get install -y ruby ruby-dev curl
   - gem install dpl -v 1.10.6
   - dpl --provider=heroku --app=tnp-fabric-node-proxy-staging --api-key=$HEROKU_API_KEY
+  - dpl --provider=heroku --app=tnp-an-proxy-staging --api-key=$HEROKU_API_KEY
   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy of Fabric Node Proxy completed on Staging :dealwithitparrot:, last commit:\"}' $SLACK_WEBHOOK_URL"
   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
   only:
@@ -28,6 +29,7 @@ production:
   - apt-get install -y ruby ruby-dev curl
   - gem install dpl -v 1.10.6
   - dpl --provider=heroku --app=tnp-fabric-node-proxy --api-key=$HEROKU_API_KEY
+  - dpl --provider=heroku --app=tnp-an-proxy --api-key=$HEROKU_API_KEY
   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy of Fabric Node Proxy completed on Production :dealwithitparrot:, last commit:\"}' $SLACK_WEBHOOK_URL"
   - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
   only:
