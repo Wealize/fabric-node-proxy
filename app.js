@@ -13,9 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined'));
 
-var s3_service = new S3Service();
 var fabric_service = new FabricService();
-s3_service.pullCreds();
 
 
 app.post('/api/v1/:chaincode_name/:chaincode_method/:instance_id',
