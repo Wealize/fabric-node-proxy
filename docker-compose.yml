@@ -1,9 +1,9 @@
 version: '2'
 
 services:
-  proxy:
+  backend:
     build: .
-    command: npm run start
+    command: yarn run dev
     volumes:
     - ../fabric-node-proxy:/usr/src/app
     ports:

@@ -1,0 +1,5 @@
+build:
+  docker:
+    backend: Dockerfile.prod
+run:
+  web: sh syncCerts.sh; yarn start
