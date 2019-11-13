@@ -1,35 +1,38 @@
 {
     "name": "fabric-node-proxy",
     "version": "1.0.0",
-    "description": "Hyperledger Fabric Car Sample Application",
-    "main": "app.js",
+    "license": "UNLICENSED",
+    "description": "Hyperledger Fabric Proxy",
+    "main": "index.ts",
     "scripts": {
-        "test": "echo \"To be implemented\" && exit 0",
-        "start": "./node_modules/.bin/babel-node app.js",
-        "dev": "./node_modules/.bin/nodemon --exec babel-node app.js",
-        "build": "babel src -d build"
+        "lint": "tslint -c tslint.json 'src/**/*.ts'",
+        "pretest": "npm run lint",
+        "test": "nyc mocha -r ts-node/register src/**/*.spec.ts",
+        "build": "webpack --config webpack.config.js",
+        "build:watch": "webpack --config webpack.config.js --watch",
+        "dev": "webpack-dev-server --open --mode development"
     },
     "dependencies": {
-        "@babel/core": "^7.1.2",
-        "@babel/node": "^7.0.0",
-        "aws-sdk": "^2.353.0",
-        "babel-cli": "^6.26.0",
-        "babel-core": "^7.0.0-bridge.0",
-        "babel-loader": "^8.0.4",
-        "babel-plugin-transform-class": "^0.3.0",
-        "babel-plugin-transform-class-properties": "^6.24.1",
-        "babel-preset-env": "^1.7.0",
-        "babel-preset-es2017": "^6.24.1",
-        "babel-preset-latest": "^6.24.1",
-        "body-parser": "^1.18.3",
-        "dotenv": "^6.1.0",
-        "express": "^4.16.4",
-        "fabric-ca-client": "~1.3.0",
-        "fabric-client": "~1.3.0",
-        "grpc": "^1.11.1",
+        "aws-sdk": "^2.564.0",
+        "body-parser": "^1.19.0",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "fabric-ca-client": "^1.4.4",
+        "fabric-client": "^1.4.4",
+        "fabric-network": "^1.4.4",
         "morgan": "^1.9.1",
-        "nodemon": "^1.18.6"
+        "typescript": "^3.7.2",
+        "webpack": "^4.41.2",
+        "webpack-dev-server": "^3.9.0",
+        "webpack-node-externals": "^1.7.2"
     },
     "author": "The Neon Project",
-    "devDependencies": {}
+    "devDependencies": {
+        "@types/node": "^12.12.6",
+        "nodemon": "^1.19.4",
+        "ts-loader": "^6.2.1",
+        "ts-node": "^8.4.1",
+        "tslint": "^5.20.1",
+        "webpack-cli": "^3.3.10"
+    }
 }

@@ -2,8 +2,12 @@ hfc-key-store/
 creds.json
 node_modules/
 .DS_Store
-.vscode/
 config.json
 certs.json
 .env
 package-lock.json
+dist/
+build/
+yarn-error.log
+connection.json
+wallet/*
