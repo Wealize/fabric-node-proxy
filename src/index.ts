@@ -1,69 +1,63 @@
 import express from "express"
 import bodyParser from "body-parser"
-// import FabricService from "./services/FabricService"
 import { config } from "dotenv"
 import morgan from "morgan"
 
+import FabricService from "./services/FabricService"
+
 config()
 
-const app = express()
 const PORT = process.env.PORT || 3030
 const TOKEN = process.env.APP_TOKEN
 
+const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan("combined"))
 
-// const fabricService = new FabricService()
+app.use((request, response, next) => {
+  if (request.query.token !== TOKEN) {
+    response.status(401).send({error: "Forbidden"})
+    return
+  }
+
+  next()
+})
+
+const fabricService = new FabricService(
+  process.env.WALLET_PATH,
+  process.env.CONNECTION_JSON_PATH)
+fabricService.withUser(process.env.USER_USERNAME)
 
 
-// app.post("/api/v1/:chaincode_name/:chaincode_method/:instance_id",
-//     (req, res) => {
+app.post("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
+    (req, res) => {
+  try {
+    fabricService
+      .withChannel(req.params.channel_name)
+      .withContract(req.params.chaincode_name)
+      .submit(req.params.chaincode_method, req.body).then(() => {
+        res.send({status: "ok"})
+    })
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
 
-//     if (req.query.token != TOKEN) {
-//         res.status(401).send({error: "Forbidden"})
-//         return
-//     }
-
-//     const payload = fabricService.serialize(req.body, req.params.instance_id)
-//     const response = fabricService.call(
-//         req.params.chaincode_name,
-//         req.params.chaincode_method,
-//         payload)
-
-//     response.then((response: any) => {
-//         return response
-//     }).then((data) => {
-//         res.send({status: "ok", data})
-//     }).catch((error) => {
-//         res.status(400).send(error)
-//     })
-// })
-
-
-// app.post("/api/v1/:chaincode_name/:chaincode_method", (req, res) => {
-
-//     if (req.query.token !== TOKEN) {
-//         res.status(401).send({error: "Forbidden"})
-//         return
-//     }
-
-//     const payload = fabricService.serialize(req.body)
-//     const response = fabricService.call(
-//         req.params.chaincode_name,
-//         req.params.chaincode_method,
-//         payload)
-
-//     response.then((response: any) => {
-//         // TODO if response is not valid do something
-//         return response.json()
-//     }).then((data) => {
-//         res.send({status: "ok", data})
-//     }).catch((error) => {
-//         res.status(400).send(error)
-//     })
-// })
+app.get("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
+    (req, res) => {
+  try {
+    fabricService
+      .withChannel(req.params.channel_name)
+      .withContract(req.params.chaincode_name)
+      .evaluate(req.params.chaincode_method).then((data) => {
+        res.send({status: "ok", data})
+    })
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
 
 app.listen(PORT, () => {
-	console.log("Server listening in port " + PORT)
+  console.log("Server listening in port " + PORT)
 })
