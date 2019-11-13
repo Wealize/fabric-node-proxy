@@ -5,8 +5,7 @@ module.exports = {
   mode: "production",
   entry: {
     index: './src/index',
-    enrollAdmin: './src/enrollAdmin',
-    registerUser: './src/registerUser',
+    enrollUser: './src/enrollUser',
     invoke: './src/invoke',
     query: './src/query'
   },

@@ -9,3 +9,4 @@ package-lock.json
 dist/
 build/
 yarn-error.log
+connection.json
