@@ -232,3 +232,15 @@ Once the json is created, add it to Heroku project as `FABRIC_CERTS` envvar.
 Let's Blockchain! Hiii Yaaa!
 
 ![](https://media.giphy.com/media/WgO4GFYzIgYHY55frA/giphy.gif)
+
+## New example for Fabric (Pending new documentation)
+
+```bash
+yarn build
+
+CONNECTION_JSON_PATH=../connection.json ADMIN_USERNAME=admin USER_USERNAME=user1 node enrollUser.js
+CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node invoke.js
+CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node query.js
+
+APP_TOKEN=token CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 USER_USERNAME=user1 node index.js
+```

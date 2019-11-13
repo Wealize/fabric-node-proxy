@@ -1,7 +1,7 @@
-import express from "express"
-import bodyParser from "body-parser"
+import * as express from "express"
+import * as bodyParser from "body-parser"
 import { config } from "dotenv"
-import morgan from "morgan"
+import * as morgan from "morgan"
 
 import FabricService from "./services/FabricService"
 
@@ -51,7 +51,7 @@ app.get("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
       .withChannel(req.params.channel_name)
       .withContract(req.params.chaincode_name)
       .evaluate(req.params.chaincode_method).then((data) => {
-        res.send({status: "ok", data})
+        res.send({status: "ok", data: JSON.parse(data)})
     })
   } catch (error) {
     res.status(400).send(error)
