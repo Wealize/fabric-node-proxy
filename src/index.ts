@@ -9,6 +9,10 @@ config()
 
 const PORT = process.env.PORT || 3030
 const TOKEN = process.env.APP_TOKEN
+const CHANNEL_NAMES = process.env.CHANNEL_NAMES.split(",")
+const CHAINCODE_NAMES = process.env.CHAINCODE_NAMES.split(",")
+const READ_METHODS = process.env.READ_METHODS.split(",")
+const WRITE_METHODS = process.env.WRITE_METHODS.split(",")
 
 const app = express()
 app.use(bodyParser.json())
@@ -24,6 +28,39 @@ app.use((request, response, next) => {
   next()
 })
 
+function isParameterInArray(
+  validElements: string[], elementToSearch: string): boolean {
+  return validElements.includes(elementToSearch)
+}
+
+app.use((request, response, next) => {
+  const method = request.method
+
+  if (
+    !isParameterInArray(CHAINCODE_NAMES, request.params.chaincode_name) ||
+    !isParameterInArray(CHANNEL_NAMES, request.params.channel_name)
+  ) {
+    response.status(400).send(
+      {status: "error", message: "Channel or chaincode not valid"})
+  }
+
+  if (method === "GET") {
+    if (
+      !isParameterInArray(READ_METHODS, request.params.chaincode_method)
+    ) {
+      response.status(400).send({status: "error", message: "Method not valid"})
+    }
+  } else if (method === "POST") {
+    if (
+      !isParameterInArray(WRITE_METHODS, request.params.chaincode_method)
+    ) {
+      response.status(400).send({status: "error", message: "Method not valid"})
+    }
+  }
+
+  next()
+})
+
 const fabricService = new FabricService(
   process.env.WALLET_PATH,
   process.env.CONNECTION_JSON_PATH)
@@ -32,6 +69,7 @@ fabricService.withUser(process.env.USER_USERNAME)
 
 app.post("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
     (req, res) => {
+
   try {
     fabricService
       .withChannel(req.params.channel_name)
@@ -46,6 +84,11 @@ app.post("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
 
 app.get("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
     (req, res) => {
+
+  if (!READ_METHODS.includes(req.params.chaincode_method)) {
+    res.status(400).send({status: "error", message: "Method not valid"})
+  }
+
   try {
     fabricService
       .withChannel(req.params.channel_name)
