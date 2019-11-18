@@ -4,6 +4,7 @@ import { config } from "dotenv"
 import * as morgan from "morgan"
 
 import FabricService from "./services/FabricService"
+import RequestValidationService from "./services/RequestValidationService"
 
 config()
 
@@ -15,51 +16,16 @@ const READ_METHODS = process.env.READ_METHODS.split(",")
 const WRITE_METHODS = process.env.WRITE_METHODS.split(",")
 
 const app = express()
+const validation = new RequestValidationService(
+  CHANNEL_NAMES,
+  CHAINCODE_NAMES,
+  READ_METHODS,
+  WRITE_METHODS)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan("combined"))
-
-app.use((request, response, next) => {
-  if (request.query.token !== TOKEN) {
-    response.status(401).send({error: "Forbidden"})
-    return
-  }
-
-  next()
-})
-
-function isParameterInArray(
-  validElements: string[], elementToSearch: string): boolean {
-  return validElements.includes(elementToSearch)
-}
-
-app.use((request, response, next) => {
-  const method = request.method
-
-  if (
-    !isParameterInArray(CHAINCODE_NAMES, request.params.chaincode_name) ||
-    !isParameterInArray(CHANNEL_NAMES, request.params.channel_name)
-  ) {
-    response.status(400).send(
-      {status: "error", message: "Channel or chaincode not valid"})
-  }
-
-  if (method === "GET") {
-    if (
-      !isParameterInArray(READ_METHODS, request.params.chaincode_method)
-    ) {
-      response.status(400).send({status: "error", message: "Method not valid"})
-    }
-  } else if (method === "POST") {
-    if (
-      !isParameterInArray(WRITE_METHODS, request.params.chaincode_method)
-    ) {
-      response.status(400).send({status: "error", message: "Method not valid"})
-    }
-  }
-
-  next()
-})
+app.use(validation.withToken(TOKEN).validateToken)
+app.use(validation.validateChaincodeRequest)
 
 const fabricService = new FabricService(
   process.env.WALLET_PATH,
@@ -84,11 +50,6 @@ app.post("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
 
 app.get("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
     (req, res) => {
-
-  if (!READ_METHODS.includes(req.params.chaincode_method)) {
-    res.status(400).send({status: "error", message: "Method not valid"})
-  }
-
   try {
     fabricService
       .withChannel(req.params.channel_name)
