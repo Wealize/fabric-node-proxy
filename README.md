@@ -234,7 +234,7 @@ CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 n
 To run the server locally we need:
 
 ```bash
-APP_TOKEN=token CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 USER_USERNAME=user1 node index.js
+APP_TOKEN=token CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 USER_USERNAME=user1 node server.js
 ```
 
 Once the json is created, add it to Heroku project as `FABRIC_CERTS` envvar.

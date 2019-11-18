@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express-serve-static-core"
+import { Request, Response, NextFunction, ParamsDictionary } from "express-serve-static-core"
 
 export default class RequestValidationService {
     private channelNames: string[]
@@ -21,7 +21,8 @@ export default class RequestValidationService {
       return this
     }
 
-    public validateToken(request, response, next) {
+    public validateToken(
+      request: Request, response: Response, next: NextFunction) {
       if (this.isValidToken(request.query.token)) {
         response.status(401).send({status: "error", message: "Forbidden"})
         return
@@ -34,20 +35,20 @@ export default class RequestValidationService {
       request: Request, response: Response, next: NextFunction) {
       const requestMethod = request.method
 
-      if (!this.isBasicRequestValid(request)) {
+      if (!this.isBasicRequestValid(request.params)) {
         response.status(400).send(
           {status: "error", message: "Channel or chaincode not valid"})
       }
 
       if (requestMethod === "GET") {
         if (
-          !this.isParameterInArray(this.readMethods, request.params.chaincode_method)
+          !this.isReadMethodValid(request.params.chaincode_method)
         ) {
           response.status(400).send({status: "error", message: "Method not valid"})
         }
       } else if (requestMethod === "POST") {
         if (
-          !this.isParameterInArray(this.writeMethods, request.params.chaincode_method)
+          !this.isWriteMethodValid(request.params.chaincode_method)
         ) {
           response.status(400).send({status: "error", message: "Method not valid"})
         }
@@ -56,22 +57,18 @@ export default class RequestValidationService {
       next()
     }
 
-    private isBasicRequestValid(request: Request) {
+    private isBasicRequestValid(parameters: ParamsDictionary) {
       return (
-        !this.isParameterInArray(this.chaincodeNames, request.params.chaincode_name) ||
-        !this.isParameterInArray(this.channelNames, request.params.channel_name))
+        this.isParameterInArray(this.chaincodeNames, parameters.chaincode_name) &&
+        this.isParameterInArray(this.channelNames, parameters.channel_name))
     }
 
-    private isReadMethodValid(requestMethod: string, chaincodeMethod: string): boolean {
-      return (
-        requestMethod === "GET" &&
-        this.isParameterInArray(this.readMethods, chaincodeMethod))
+    private isReadMethodValid(chaincodeMethod: string): boolean {
+      return this.isParameterInArray(this.readMethods, chaincodeMethod)
     }
 
-    private isWriteMethodValid(requestMethod: string, chaincodeMethod: string): boolean {
-      return (
-        requestMethod === "POST" &&
-        this.isParameterInArray(this.readMethods, chaincodeMethod))
+    private isWriteMethodValid(chaincodeMethod: string): boolean {
+      return this.isParameterInArray(this.writeMethods, chaincodeMethod)
     }
 
     private isParameterInArray(
