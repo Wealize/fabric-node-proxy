@@ -1,3 +1,4 @@
+import * as path from "path"
 import * as express from "express"
 import * as bodyParser from "body-parser"
 import { config } from "dotenv"
@@ -6,7 +7,8 @@ import * as morgan from "morgan"
 import FabricService from "./services/FabricService"
 import RequestValidationService from "./services/RequestValidationService"
 
-config()
+const DOT_ENV_FILEPATH = process.env.DOT_ENV_FILEPATH || ".env"
+config({path: path.resolve(process.cwd(), DOT_ENV_FILEPATH)})
 
 // TODO Initialize in another file
 const TOKEN = process.env.APP_TOKEN

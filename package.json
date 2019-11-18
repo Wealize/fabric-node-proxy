@@ -5,13 +5,13 @@
   "description": "Hyperledger Fabric Proxy",
   "main": "index.ts",
   "scripts": {
-    "test": "APP_TOKEN=token jest",
-    "test:generate-output": "jest --json --outputFile=jest-test-results.json",
-    "coverage": "jest --coverage",
-    "test-with-coverage": "APP_TOKEN=token jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
+    "test": "DOT_ENV_FILEPATH=.env_test jest",
+    "test:generate-output": "DOT_ENV_FILEPATH=.env_test jest --json --outputFile=jest-test-results.json",
+    "coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage",
+    "test-with-coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
     "build": "webpack --config webpack.config.js",
     "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
-    "start:watch": "APP_TOKEN=token nodemon"
+    "start:watch": "nodemon"
   },
   "dependencies": {
     "@types/webpack": "^4.41.0",
