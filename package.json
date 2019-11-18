@@ -5,13 +5,13 @@
   "description": "Hyperledger Fabric Proxy",
   "main": "index.ts",
   "scripts": {
-    "test": "jest",
+    "test": "APP_TOKEN=token jest",
     "test:generate-output": "jest --json --outputFile=jest-test-results.json",
     "coverage": "jest --coverage",
-    "test-with-coverage": "jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
+    "test-with-coverage": "APP_TOKEN=token jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
     "build": "webpack --config webpack.config.js",
     "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
-    "start:watch": "nodemon"
+    "start:watch": "APP_TOKEN=token nodemon"
   },
   "dependencies": {
     "@types/webpack": "^4.41.0",
