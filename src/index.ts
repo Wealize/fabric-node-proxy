@@ -44,7 +44,7 @@ app.post("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
         res.send({status: "ok"})
     })
   } catch (error) {
-    res.status(400).send(error)
+    res.status(400).send({status: "error", message: error})
   }
 })
 
@@ -58,7 +58,7 @@ app.get("/api/v1/:channel_name/:chaincode_name/:chaincode_method",
         res.send({status: "ok", data: JSON.parse(data)})
     })
   } catch (error) {
-    res.status(400).send(error)
+    res.status(400).send({status: "error", message: error})
   }
 })
 

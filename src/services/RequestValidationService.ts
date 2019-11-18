@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express-serve-static-core"
 
 export default class RequestValidationService {
     private channelNames: string[]
@@ -21,32 +22,30 @@ export default class RequestValidationService {
     }
 
     public validateToken(request, response, next) {
-      if (request.query.token !== this.token) {
-        response.status(401).send({error: "Forbidden"})
+      if (this.isValidToken(request.query.token)) {
+        response.status(401).send({status: "error", message: "Forbidden"})
         return
       }
 
       next()
     }
 
-    public validateChaincodeRequest(request, response, next) {
-      const method = request.method
+    public validateChaincodeRequest(
+      request: Request, response: Response, next: NextFunction) {
+      const requestMethod = request.method
 
-      if (
-        !this.isParameterInArray(this.chaincodeNames, request.params.chaincode_name) ||
-        !this.isParameterInArray(this.channelNames, request.params.channel_name)
-      ) {
+      if (!this.isBasicRequestValid(request)) {
         response.status(400).send(
           {status: "error", message: "Channel or chaincode not valid"})
       }
 
-      if (method === "GET") {
+      if (requestMethod === "GET") {
         if (
           !this.isParameterInArray(this.readMethods, request.params.chaincode_method)
         ) {
           response.status(400).send({status: "error", message: "Method not valid"})
         }
-      } else if (method === "POST") {
+      } else if (requestMethod === "POST") {
         if (
           !this.isParameterInArray(this.writeMethods, request.params.chaincode_method)
         ) {
@@ -57,8 +56,30 @@ export default class RequestValidationService {
       next()
     }
 
-    public isParameterInArray(
+    private isBasicRequestValid(request: Request) {
+      return (
+        !this.isParameterInArray(this.chaincodeNames, request.params.chaincode_name) ||
+        !this.isParameterInArray(this.channelNames, request.params.channel_name))
+    }
+
+    private isReadMethodValid(requestMethod: string, chaincodeMethod: string): boolean {
+      return (
+        requestMethod === "GET" &&
+        this.isParameterInArray(this.readMethods, chaincodeMethod))
+    }
+
+    private isWriteMethodValid(requestMethod: string, chaincodeMethod: string): boolean {
+      return (
+        requestMethod === "POST" &&
+        this.isParameterInArray(this.readMethods, chaincodeMethod))
+    }
+
+    private isParameterInArray(
       validElements: string[], elementToSearch: string): boolean {
       return validElements.includes(elementToSearch)
+    }
+
+    private isValidToken(token: string): boolean {
+      return token !== this.token
     }
 }

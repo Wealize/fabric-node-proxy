@@ -16,17 +16,15 @@ In TNP we use several components to simplify how we develop smart contracts and 
 
 ## IBM Blockchain
 
-IBM Blockchain is our `server`, it deploys easily a Hyperledger Fabric server we can use to deploy our smart contracts.
+IBM Blockchain is our `server`, it deploys easily a Hyperledger Fabric server we can use to deploy our smart contracts. You can see how to configure IBM Blockchain on their excellent [video tutorials](https://developer.ibm.com/series/ibm-blockchain-platform-console-video-series/).
 
-We use Go as the language for the smart contracts because the mocks for the unit and integration tests are mature, and testing
-manually smart contracts is slow and tedious.
+We use Typescript as the language for the smart contracts and the proxy.
 
 ## Proxy
 
 Fabric client SDKs are under heavy development and currently the Node SDK is the most mature. We might use the Python SDK in the future but It doesn't work well right now.
 
-Since we have many backend code written in Python and we need to connect and execute
-smart contract functions from there, we decided to create a proxy in Node for Fabric so we have a Rest API to access from any other backend,
+Since we have many backend code written in Python and we need to connect and execute smart contract functions from there, we decided to create a proxy in Node with Typescript for Fabric so we have a Rest API to access from any other backend,
 so we don't need to take into account in which language we write our backend, but just create an API HTTP client to execute functions on an specific smart contract.
 
 ## Project implementation
@@ -54,15 +52,13 @@ To give our project Blockchain powers we'll need to implement one (or maybe more
 
 You should follow the same structure so you can also implement the tests and run everything using Docker. The idea would be to do something like:
 
-Create the `chaincode` dir in your project. Inside this folder, we'll create the `Dockerfile` and a dir called `ngo`. ngo dir will have smart contract code (`ngo.go`) and its tests (`ngo_test.go`)
+Create the `chaincode` dir in your project. Inside this folder, we'll create the `Dockerfile` and a dir called `ngo`. ngo dir will have smart contract code (`ngo.ts`) and its tests (`ngo.spec.ts`) among other libraries of our own to simplify the code.
 
 ```bash
 mkdir chaincode
 cd chaincode
-mkdir ngo
-touch ngo/ngo.go
-touch ngo/ngo_test.go
-touch Dockerfile
+touch ngo.ts
+touch ngo.spec.ts
 ```
 
 Copy the Dockerfile content from [Odos repository example](https://github.com/TheNeonProject/odos/blob/master/chaincode/Dockerfile) in your Dockerfile
@@ -81,70 +77,61 @@ docker run --rm -v "$PWD":/usr/src/app -w /usr/src/app/project project-chaincode
 
 ## HTTP client in the project
 
-Every project connecting to the Fabric proxy will need a service implementing the POST to the Fabric proxy with its specific smart contract
+Every project connecting to the Fabric proxy will need a service implementing the GET to read and POST to write to the Fabric proxy with its specific smart contract
 and methods. [An example can be seen in the Odos project](https://github.com/TheNeonProject/odos/blob/master/refugees/services.py#L13)
+
+The `GET` would be:
+
+```curl
+GET {host}/api/v1/{chaincode_name}/{chaincode_method}?token={token}
+Content-type: application/json
+```
 
 The `POST` looks like this:
 
 ```curl
-POST {host}/api/v1/{chaincode_name}/{chaincode_method}/{resource_id}?token={token}
+POST {host}/api/v1/{chaincode_name}/{chaincode_method}?token={token}
 Content-type: application/json
 
 body
 ```
 
-## CI/CD
+The response in both cases would be:
 
-You can see [a working example in the Odos project](https://github.com/TheNeonProject/odos/blob/master/.gitlab-ci.yml).
+```json
+Content-type: application/json
 
-The two phases would be something like this:
+{
+  "status": "ok",
+  "data": [{"my": "data"}]
+}
 
-```yaml
-build:chaincode:
-image: golang:1.10
-script:
-- go get -v -u github.com/hyperledger/fabric-sdk-go
-- go get -v -u github.com/stretchr/testify/assert
-- mkdir -p $GOPATH/src/gitlab.com/TheNeonProject/myproject
-- cp -r /builds/TheNeonProject/myproject/chaincode/myproject/* $GOPATH/src/gitlab.com/TheNeonProject/myproject
-
-# Build hyperledger fabric
-- apt-get update && apt-get install -y libltdl-dev
-- mkdir -p $GOPATH/src/github.com/hyperledger
-- cd $GOPATH/src/github.com/hyperledger
-- git clone -b master https://github.com/hyperledger/fabric.git
-
-- cd $GOPATH/src/gitlab.com/TheNeonProject/myproject
-- go test -v .
-
-chaincode_staging:
-type: deploy
-script:
-- "curl -X POST https://$NETWORK_KEY:$NETWORK_PASS@blockchain-starter.eu-gb.bluemix.net/api/v1/networks/$NETWORK_ID/chaincode/install -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -F 'files=@chaincode/myproject/myproject.go' -F 'chaincode_id=myproject' -F \"chaincode_version=$CI_COMMIT_SHA\" -F 'chaincode_type=golang'"
-- "curl -X POST https://$NETWORK_KEY:$NETWORK_PASS@blockchain-starter.eu-gb.bluemix.net/api/v1/networks/$NETWORK_ID/channels/$STAGING_CHANNEL_ID/chaincode/instantiate -H 'accept: application/json' -H 'Content-Type: application/json' --data '{ \"chaincode_id\": \"myproject\", \"chaincode_version\": \"'\"$CI_COMMIT_SHA\"'\", \"chaincode_type\": \"golang\", \"chaincode_arguments\": [], \"endorsement_policy\": { \"identities\": [ { \"role\": { \"name\": \"member\", \"mspId\": \"org1\" } }, { \"role\": { \"name\": \"member\", \"mspId\": \"org2\" } } ], \"policy\": { \"1-of\": [ { \"signed-by\": 0 }, { \"signed-by\": 1 } ] } }}'"
-- "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy Myproject Chaincode completed in IBM Blockchain Staging :cryptoparrot:, last commit:\"}' $SLACK_WEBHOOK_URL"
-- "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
-only:
-- master
-
-chaincode_production:
-type: deploy
-script:
-- "curl -X POST https://$NETWORK_KEY:$NETWORK_PASS@blockchain-starter.eu-gb.bluemix.net/api/v1/networks/$NETWORK_ID/chaincode/install -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -F 'files=@chaincode/myproject/myproject.go' -F 'chaincode_id=myproject' -F \"chaincode_version=$CI_COMMIT_TAG\" -F 'chaincode_type=golang'"
-- "curl -X POST https://$NETWORK_KEY:$NETWORK_PASS@blockchain-starter.eu-gb.bluemix.net/api/v1/networks/$NETWORK_ID/channels/$CHANNEL_ID/chaincode/instantiate -H 'accept: application/json' -H 'Content-Type: application/json' --data '{ \"chaincode_id\": \"myproject\", \"chaincode_version\": \"'\"$CI_COMMIT_TAG\"'\", \"chaincode_type\": \"golang\", \"chaincode_arguments\": [], \"endorsement_policy\": { \"identities\": [ { \"role\": { \"name\": \"member\", \"mspId\": \"org1\" } }, { \"role\": { \"name\": \"member\", \"mspId\": \"org2\" } } ], \"policy\": { \"1-of\": [ { \"signed-by\": 0 }, { \"signed-by\": 1 } ] } }}'"
-- "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy Myproject Chaincode completed in IBM Blockchain Production :cryptoparrot:, last commit:\"}' $SLACK_WEBHOOK_URL"
-- "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$CI_COMMIT_TITLE\"'\"}' $SLACK_WEBHOOK_URL"
-only:
-- tags
 ```
 
-Next variables have to be added to Gitlab CI project:
+In case of error:
 
-- `$NETWORK_ID` (required): `network_id` in IBM Network credentials
-- `$NETWORK_KEY` (required): `key` in IBM Network credentials
-- `$NETWORK_PASS` (required): `secret` in IBM Network credentials
-- `$CHANNEL_ID` (required): the is the name we added when we created the channel for this project (`defaultchannel` by default)
-- `$SLACK_WEBHOOK_URL` (optional): to send messages to Slack channels
+```json
+Content-type: application/json
+
+{
+  "status": "error",
+  "message": "message"
+}
+
+```
+
+## CI/CD
+
+Please check the `.github` folder to see how we develop using Github Actions on
+this project.
+
+To complete the Github Actions configuration you need the following variables:
+
+- `$CODACY_PROJECT_TOKEN`
+- `$HEROKU_API_TOKEN`
+- `$HEROKU_APP_STAGING`
+- `$HEROKU_APP_PRODUCTION`
+- `$SLACK_WEBHOOK_URL`
 
 ![](https://user-images.githubusercontent.com/488556/50650717-8e0e2400-0f81-11e9-90dc-9668735b9225.png)
 
@@ -165,11 +152,21 @@ Add this json to the proxy configuration in Heroku using the `FABRIC_CREDS` envv
 
 Now we'll work in the config to perform queries to the chaincode/smart contract.
 
-- Start with `npm install` to install all dependencies. If you got an error installing grpc@1.14.2 try with `npm install --build-from-source`
-- Create an .env file in the repository with a key called `FABRIC_USERNAME`. The value of this key will be an username that doesn't already exist in the IBM dahboard. If the blockchain is new, there'll be only to users, `admin` and `peer1`.
-- Execute `enrollAdmin` with the command `./node_modules/.bin/babel-node enrollAdmin.js` to enroll admin user
-- Add `registerUser.js require('dotenv').config();` at top of `registerUser.js` file to be able to execute next command, `./node_modules/.bin/babel-node registerUser.js` that will enroll the user you set in the `FABRIC_USERNAME` var in the `.env` file
-- If everything is executed without problems, lets create the json that will contain all users info and its certificates. Create a new json, for example `certs.json` This will consist in a composition of the generated users and certificates for the client. Go to `hfc-key-store` dir and merge merge all those files into a json. The json will consist in:
+- Start with `yarn install` to install all dependencies.
+- Build typescript with `yarn build`.
+- Execute `enrollUser` with the following command.
+
+```bash
+  CONNECTION_JSON_PATH=../connection.json \
+  ADMIN_USERNAME=admin \
+  USER_USERNAME=user1 node enrollUser.js
+```
+
+*CONNECTION_PATH* is a file we can get when we instantiate for the first time a smart contract on IBM Blockchain platform, so if this happened you can check if it's on 1password under the project vault.
+*ADMIN_USERNAME* is the admin wallet in charge of this channel, this we also need to get from IBM Blockchain.
+*USER_USERNAME* is the user we want to enroll for this app locally, his/her credentials will be stored in the `wallet` local folder.
+
+- If `enrollUser` is executed without problems, lets create the json that will contain all users info and its certificates. Create a new json, for example `certs.json` This will consist in a composition of the generated users and certificates for the client. Go to `wallet` directory and merge merge all those files into a json. The json will consist in:
 
 ```json
 [
@@ -227,20 +224,25 @@ Now we'll work in the config to perform queries to the chaincode/smart contract.
 ]
 ```
 
+- We can test the configuration locally using `invoke` and `query`
+
+```bash
+CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node invoke.js
+CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node query.js
+```
+
+To run the server locally we need:
+
+```bash
+APP_TOKEN=token CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 USER_USERNAME=user1 node index.js
+```
+
 Once the json is created, add it to Heroku project as `FABRIC_CERTS` envvar.
 
 Let's Blockchain! Hiii Yaaa!
 
 ![](https://media.giphy.com/media/WgO4GFYzIgYHY55frA/giphy.gif)
 
-## New example for Fabric (Pending new documentation)
-
-```bash
-yarn build
-
-CONNECTION_JSON_PATH=../connection.json ADMIN_USERNAME=admin USER_USERNAME=user1 node enrollUser.js
-CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node invoke.js
-CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 node query.js
-
-APP_TOKEN=token CONNECTION_JSON_PATH=../connection.json WALLET_PATH=wallet USER_USERNAME=user1 USER_USERNAME=user1 node index.js
-```
+ <!-- TODO Talk about instantiating smart contracts -->
+ <!-- TODO Talk about Creating chaincode packages using the IBM Blockchain platform VS Code plugin -->
+ <!-- TODO Talk about how to run the IBM Blockchain platform locally using the VS Code platform -->
