@@ -38,6 +38,7 @@ export default class RequestValidationService {
       if (!this.isBasicRequestValid(request.params)) {
         response.status(400).send(
           {status: "error", message: "Channel or chaincode not valid"})
+        return
       }
 
       if (requestMethod === "GET") {
@@ -45,12 +46,14 @@ export default class RequestValidationService {
           !this.isReadMethodValid(request.params.chaincode_method)
         ) {
           response.status(400).send({status: "error", message: "Method not valid"})
+          return
         }
       } else if (requestMethod === "POST") {
         if (
           !this.isWriteMethodValid(request.params.chaincode_method)
         ) {
           response.status(400).send({status: "error", message: "Method not valid"})
+          return
         }
       }
 

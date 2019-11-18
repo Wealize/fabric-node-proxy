@@ -8,7 +8,14 @@ import RequestValidationService from "./services/RequestValidationService"
 
 config()
 
+// TODO Initialize in another file
 const TOKEN = process.env.APP_TOKEN
+
+if (!TOKEN) {
+  console.log("You need to set the envvar APP_TOKEN")
+  process.exit(1)
+}
+
 const CHANNEL_NAMES = process.env.CHANNEL_NAMES ?
   process.env.CHANNEL_NAMES.split(",") : []
 const CHAINCODE_NAMES = process.env.CHAINCODE_NAMES ?
@@ -32,14 +39,18 @@ const validation = new RequestValidationService(
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan("combined"))
-app.use(validation.withToken(TOKEN).validateToken)
-app.use(validation.validateChaincodeRequest)
+app.use(
+  (request, response, next) => {
+    validation.withToken(TOKEN).validateToken(request, response, next)
+})
+app.use((request, response, next) => {
+  validation.validateChaincodeRequest(request, response, next)
+})
 
 const fabricService = new FabricService(
   WALLET_PATH,
   CONNECTION_JSON_PATH)
 fabricService.withUser(USER_USERNAME)
-
 
 app.post(BASE_ROUTE, (req, res) => {
   try {
