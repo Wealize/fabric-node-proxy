@@ -14,6 +14,7 @@
     "start:watch": "nodemon"
   },
   "dependencies": {
+    "@sentry/node": "^5.9.0",
     "@types/webpack": "^4.41.0",
     "aws-sdk": "^2.564.0",
     "body-parser": "^1.19.0",

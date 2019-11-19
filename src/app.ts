@@ -7,6 +7,9 @@ import * as morgan from "morgan"
 import FabricService from "./services/FabricService"
 import RequestValidationService from "./services/RequestValidationService"
 
+const Sentry = require('@sentry/node');
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
 const DOT_ENV_FILEPATH = process.env.DOT_ENV_FILEPATH || ".env"
 config({path: path.resolve(process.cwd(), DOT_ENV_FILEPATH)})
 
