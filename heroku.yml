@@ -2,8 +2,4 @@ build:
   docker:
     web: Dockerfile.prod
 run:
-  web: yarn start
-release:
-  image: web
-  command:
-    - ./sync.sh
+  web: ./sync.sh; yarn start
