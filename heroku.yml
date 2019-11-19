@@ -1,5 +1,5 @@
 build:
   docker:
-    backend: Dockerfile.prod
+    web: Dockerfile.prod
 run:
-  backend: yarn build; yarn start
+  web: yarn start

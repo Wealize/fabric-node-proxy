@@ -5,8 +5,7 @@ RUN apt update && apt install -y python build-essential && \
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 RUN yarn install
 COPY . /usr/src/app
-
-EXPOSE $PORT
+RUN yarn build
