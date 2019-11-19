@@ -22,6 +22,7 @@ jobs:
         CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
     - uses: 8398a7/action-slack@v2
+      if: failure()
       with:
         status: ${{ job.status }}
         author_name: TnpBot
