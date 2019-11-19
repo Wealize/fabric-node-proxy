@@ -2,4 +2,4 @@ build:
   docker:
     backend: Dockerfile.prod
 run:
-  backend: yarn start
+  backend: yarn build; yarn start

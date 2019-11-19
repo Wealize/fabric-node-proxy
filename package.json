@@ -9,7 +9,7 @@
     "test:generate-output": "DOT_ENV_FILEPATH=.env_test jest --json --outputFile=jest-test-results.json",
     "coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage",
     "test-with-coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js --mode production",
     "start": "node build/index.js",
     "start:watch": "nodemon"
   },
