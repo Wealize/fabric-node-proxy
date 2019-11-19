@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, ParamsDictionary } from "express-serve-static-core"
+import * as express from "express"
 
 export default class RequestValidationService {
     private channelNames: string[]
@@ -22,7 +22,8 @@ export default class RequestValidationService {
     }
 
     public validateToken(
-      request: Request, response: Response, next: NextFunction) {
+      request: express.Request, response: express.Response,
+      next: express.NextFunction) {
       if (this.isValidToken(request.query.token)) {
         response.status(401).send({status: "error", message: "Forbidden"})
         return
@@ -32,7 +33,8 @@ export default class RequestValidationService {
     }
 
     public validateChaincodeRequest(
-      request: Request, response: Response, next: NextFunction) {
+      request: express.Request, response: express.Response,
+      next: express.NextFunction) {
       const requestMethod = request.method
 
       if (!this.isBasicRequestValid(request.params)) {
@@ -60,7 +62,7 @@ export default class RequestValidationService {
       next()
     }
 
-    private isBasicRequestValid(parameters: ParamsDictionary) {
+    private isBasicRequestValid(parameters: any) {
       return (
         this.isParameterInArray(this.chaincodeNames, parameters.chaincode_name) &&
         this.isParameterInArray(this.channelNames, parameters.channel_name))

@@ -45,21 +45,21 @@ app.use(
   (request, response, next) => {
     validation.withToken(TOKEN).validateToken(request, response, next)
 })
-app.use((request, response, next) => {
-  validation.validateChaincodeRequest(request, response, next)
-})
 
 const fabricService = new FabricService(
   WALLET_PATH,
   CONNECTION_JSON_PATH)
 fabricService.withUser(USER_USERNAME)
 
-app.post(BASE_ROUTE, (req, res) => {
+app.post(
+  BASE_ROUTE,
+  (request, response, next) => validation.validateChaincodeRequest(request, response, next),
+  (request: express.Request, res: express.Response) => {
   try {
     fabricService
-      .withChannel(req.params.channel_name)
-      .withContract(req.params.chaincode_name)
-      .submit(req.params.chaincode_method, req.body).then(() => {
+      .withChannel(request.params.channel_name)
+      .withContract(request.params.chaincode_name)
+      .submit(request.params.chaincode_method, request.body).then(() => {
         res.send({status: "ok"})
     })
   } catch (error) {
@@ -67,16 +67,20 @@ app.post(BASE_ROUTE, (req, res) => {
   }
 })
 
-app.get(BASE_ROUTE, (req, res) => {
+app.get(
+  BASE_ROUTE,
+  (request, response, next) => validation.validateChaincodeRequest(request, response, next),
+  (request: express.Request, response: express.Response) => {
+
   try {
     fabricService
-      .withChannel(req.params.channel_name)
-      .withContract(req.params.chaincode_name)
-      .evaluate(req.params.chaincode_method).then((data) => {
-        res.send({status: "ok", data: JSON.parse(data)})
+      .withChannel(request.params.channel_name)
+      .withContract(request.params.chaincode_name)
+      .evaluate(request.params.chaincode_method).then((data) => {
+        response.send({status: "ok", data: JSON.parse(data)})
     })
   } catch (error) {
-    res.status(400).send({status: "error", message: error})
+    response.status(400).send({status: "error", message: error})
   }
 })
 
