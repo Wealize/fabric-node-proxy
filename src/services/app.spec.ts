@@ -1,7 +1,6 @@
 import * as request from "supertest"
 
 import app from "../app"
-import FabricService from "../services/FabricService"
 
 describe("GET chaincode", () => {
   it("Get index should be forbidden if not token", async () => {

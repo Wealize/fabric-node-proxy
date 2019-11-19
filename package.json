@@ -10,7 +10,7 @@
     "coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage",
     "test-with-coverage": "DOT_ENV_FILEPATH=.env_test jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
     "build": "webpack --config webpack.config.js",
-    "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
+    "start": "node build/index.js",
     "start:watch": "nodemon"
   },
   "dependencies": {
