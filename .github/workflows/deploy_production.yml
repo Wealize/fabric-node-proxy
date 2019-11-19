@@ -30,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Push to Heroku
-      run: git push https://heroku:${{ secrets.HEROKU_API_TOKEN }}@git.heroku.com/${{ secrets.HEROKU_APP_PRODUCTION }}.git origin/master:master
+      run: git push -f https://heroku:${{ secrets.HEROKU_API_TOKEN }}@git.heroku.com/${{ secrets.HEROKU_APP_PRODUCTION }}.git origin/master:master
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@master
       env:
