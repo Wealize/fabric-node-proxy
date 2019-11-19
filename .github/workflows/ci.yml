@@ -46,10 +46,10 @@ jobs:
 
     - uses: 8398a7/action-slack@v2
       with:
-        type: ${{ job.status }}
-        username: TnpBot
-        icon_emoji: ':octocat:'
+        status: ${{ job.status }}
+        author_name: TnpBot
+        text: Fabric Node Proxy
         channel: '#dev-watchdog'
       env:
         GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
