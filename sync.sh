@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo $CONNECTION_JSON > connection.json
+mkdir -p wallet/$USER_USERNAME
+cd wallet/$USER_USERNAME
+echo $USER_IDENTITY_JSON > $USER_USERNAME
+echo $USER_PRIVATE_KEY > "${USER_SIGNIN_IDENTITY_HASH}-priv"
+echo $USER_PUBLIC_KEY > "${USER_SIGNIN_IDENTITY_HASH}-pub"
