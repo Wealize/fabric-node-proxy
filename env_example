@@ -1,0 +1,7 @@
+APP_TOKEN=token
+CHANNEL_NAMES=channel1
+CHAINCODE_NAMES=fabcar
+READ_METHODS=queryAllCars,queryCar
+WRITE_METHODS=createCar,changeCarOwner
+USER_USERNAME=user1
+CONNECTION_PATH=connection.json

@@ -11,3 +11,6 @@ build/
 yarn-error.log
 connection.json
 wallet/*
+.nyc_output/
+.vscode/
+coverage/

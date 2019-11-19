@@ -1,1 +1,0 @@
-web: sh syncCerts.sh; npm start

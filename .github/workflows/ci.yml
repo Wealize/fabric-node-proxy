@@ -14,5 +14,18 @@ jobs:
       with:
         node-version: '10.x'
 
-    - name: Install, test and coverage
-      uses: actions/tnp-frontend-testing-action@0.1
+    - name: Install dependencies
+      run: yarn install
+
+    - run: yarn test-with-coverage
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+    - uses: 8398a7/action-slack@v2
+      with:
+        status: ${{ job.status }}
+        author_name: TnpBot
+        text: Fabric Node Proxy
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
