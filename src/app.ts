@@ -3,11 +3,11 @@ import * as express from "express"
 import * as bodyParser from "body-parser"
 import { config } from "dotenv"
 import * as morgan from "morgan"
+import * as Sentry from "@sentry/node"
 
 import FabricService from "./services/FabricService"
 import RequestValidationService from "./services/RequestValidationService"
 
-import * as Sentry from "@sentry/node"
 Sentry.init({ dsn: process.env.SENTRY_DSN })
 
 const DOT_ENV_FILEPATH = process.env.DOT_ENV_FILEPATH || ".env"
