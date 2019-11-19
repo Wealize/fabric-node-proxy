@@ -56,7 +56,7 @@ jobs:
   deploy_production:
     runs-on: ubuntu-latest
 
-    if: success() && github.ref == 'refs/tags/*'
+    if: success() && contains(github.ref, 'tags')
 
     needs: test
 
