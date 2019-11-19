@@ -32,3 +32,24 @@ jobs:
     - run: yarn test-with-coverage
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_CHANNEL: dev-watchdog
+        SLACK_COLOR: '#3278BD'
+        SLACK_ICON: https://github.com/tnpbot.png?size=48
+        SLACK_MESSAGE: 'Test status: ${{ job.status }} for {{ github.github_ref }}, You can access the jobs here https://github.com/TheNeonProject/fabric-node-proxy/actions'
+        SLACK_TITLE: Fabric Node Proxy
+        SLACK_USERNAME: TNPBot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+    - uses: 8398a7/action-slack@v2
+      with:
+        type: ${{ job.status }}
+        username: TnpBot
+        icon_emoji: ':octocat:'
+        channel: '#dev-watchdog'
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
