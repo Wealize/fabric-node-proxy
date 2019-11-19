@@ -1,1 +1,1 @@
-web: sh syncCerts.sh; npm start
+backend: yarn build; yarn start
